@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 
-import serviceAccount  from '../.secret/serviceAccountKey.json'
+import serviceAccount from '../.secret/serviceAccountKey.json';
 
 const app = admin.initializeApp({
   // @ts-ignore
