@@ -9,6 +9,7 @@
   "scripts": {
     "compile": "tsc",
     "postinstall": "tsc",
+    "build": "tsc",
     "start": "nodemon --exec npx ts-node index.ts"
   },
   "author": "",
