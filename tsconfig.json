@@ -5,8 +5,13 @@
     "rootDir": "./",
     "outDir": "./build",
     "esModuleInterop": true,
-    "resolveJsonModule": true,
     "noImplicitAny": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "resolveJsonModule": true
+  },
+  "exclude": ["node_modules"],
+  "files": ["index.ts", "index.d.ts"],
+  "ts-node": {
+    "files": true
   }
 }
