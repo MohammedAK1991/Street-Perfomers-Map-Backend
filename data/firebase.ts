@@ -1,6 +1,5 @@
 import admin from 'firebase-admin';
 
-// import serviceAccount from '../.secret/serviceAccountKey.json';
 const serviceAccount = {
   type: 'service_account',
   project_id: 'callypso-c1252',
@@ -16,12 +15,12 @@ const serviceAccount = {
     'https://www.googleapis.com/robot/v1/metadata/x509/idk-453%40callypso-c1252.iam.gserviceaccount.com',
 };
 
-const app = admin.initializeApp({
+export const app = admin.initializeApp({
   // @ts-ignore
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://callypso-c1252.firebaseio.com',
 });
 
-export const firestore = app.firestore();
+const firestore = app.firestore();
 
 export default firestore;
