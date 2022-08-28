@@ -1,11 +1,12 @@
 import express, { Request, Response } from 'express';
 const router = express.Router();
-import firebase from 'firebase-admin';
+import { authenticateFirebaseToken } from '../auth/auth';
 
 import firestore from '../data/firebase';
 
 router.get(
   '/emails/:uid',
+  authenticateFirebaseToken,
   async (req: express.Request, res: express.Response) => {
     try {
       if (!req.params.uid) {
@@ -19,7 +20,16 @@ router.get(
         return;
       }
 
-      const emails = doc.data().emails;
+      const emailsSubCollectionSnapshot = await firestore
+        .collection('users')
+        .doc(req.params.uid)
+        .collection('emails')
+        .get();
+      const emails = [];
+      for await (const email of emailsSubCollectionSnapshot.docs) {
+        const emailData = email.data();
+        emails.push({ id: email.id, email: emailData.email });
+      }
 
       res.status(200).send(emails);
     } catch (err) {
@@ -31,11 +41,13 @@ router.get(
 
 router.post(
   '/emails/:uid',
+  authenticateFirebaseToken,
   async (req: express.Request, res: express.Response) => {
     try {
+      const { uid } = req.params;
       const { emailAddress } = req.body;
 
-      const doc = await firestore.collection('users').doc(req.params.uid).get();
+      const doc = await firestore.collection('users').doc(uid).get();
 
       if (!doc.exists) {
         res.status(404).send(new Error('User document does not exist'));
@@ -44,12 +56,14 @@ router.post(
 
       await firestore
         .collection('users')
-        .doc(req.params.uid)
-        .update({
-          emails: firebase.firestore.FieldValue.arrayUnion(emailAddress),
+        .doc(uid)
+        .collection('emails')
+        .doc(emailAddress)
+        .set({
+          email: emailAddress,
         });
 
-      res.status(200).send('OK');
+      res.status(200).send('email address added to user document');
     } catch (err) {
       console.error(err);
       res.status(500).send(err);
@@ -57,29 +71,34 @@ router.post(
   },
 );
 
-router.delete('/emails/:uid', async (req: Request, res: Response) => {
-  try {
-    const { uid } = req.params;
+router.delete(
+  '/emails/:uid',
+  authenticateFirebaseToken,
+  async (req: Request, res: Response) => {
+    try {
+      const { uid } = req.params;
 
-    const { emailAddress } = req.body;
+      const { emailAddress } = req.body;
 
-    const doc = await firestore.collection('users').doc(uid).get();
+      const doc = await firestore.collection('users').doc(uid).get();
 
-    if (!doc.exists) {
-      res.status(404).send(Error('User Not Found'));
-      return;
+      if (!doc.exists) {
+        res.status(404).send(Error('User Not Found'));
+        return;
+      }
+
+      await firestore
+        .collection('users')
+        .doc(req.params.uid)
+        .collection('emails')
+        .doc(emailAddress)
+        .delete();
+
+      res.status(200).send('OK');
+    } catch (err) {
+      res.status(500).send(err);
     }
-
-    await firestore
-      .collection('users')
-      .doc(req.params.uid)
-      .update({
-        emails: firebase.firestore.FieldValue.arrayRemove(emailAddress),
-      });
-    res.status(200).send('OK');
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
+  },
+);
 
 export default router;
