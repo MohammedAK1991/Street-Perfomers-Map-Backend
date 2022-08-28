@@ -1,6 +1,5 @@
 import express from 'express';
 import { app } from '../data/firebase';
-import { Token } from './Token';
 
 export function authenticateFirebaseToken(
   req: express.Request,
@@ -19,14 +18,10 @@ export function authenticateFirebaseToken(
   app
     .auth()
     .verifyIdToken(token)
-    .then((decoded) => {
-      req.token = new Token(
-        decoded.sub,
-        decoded.email,
-        decoded.iat,
-        'viewer',
-        decoded.exp,
-      );
+    .then(() => {
       next();
+    })
+    .catch((error) => {
+      console.log('error verifiying token in firebase auth', error);
     });
 }

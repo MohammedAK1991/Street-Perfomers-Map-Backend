@@ -10,7 +10,7 @@
     "resolveJsonModule": true
   },
   "exclude": ["node_modules"],
-  "files": ["index.ts", "index.d.ts"],
+  "files": ["index.ts"],
   "ts-node": {
     "files": true
   }
