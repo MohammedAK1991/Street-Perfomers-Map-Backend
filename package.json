@@ -10,7 +10,8 @@
     "compile": "tsc",
     "postinstall": "tsc",
     "build": "tsc",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "start-dev": "nodemon --exec npx ts-node index.ts"
   },
   "author": "",
   "license": "ISC",
