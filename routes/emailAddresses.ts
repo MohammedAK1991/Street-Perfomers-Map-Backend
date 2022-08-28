@@ -101,4 +101,36 @@ router.delete(
   },
 );
 
+router.patch(
+  '/emails/:uid',
+  authenticateFirebaseToken,
+  async (req: Request, res: Response) => {
+    try {
+      const { uid } = req.params;
+
+      const { emailAddress } = req.body;
+
+      const doc = await firestore.collection('users').doc(uid).get();
+
+      if (!doc.exists) {
+        res.status(404).send(Error('User Not Found'));
+        return;
+      }
+
+      await firestore
+        .collection('users')
+        .doc(uid)
+        .collection('emails')
+        .doc()
+        .update({
+          email: emailAddress,
+        });
+
+      res.status(200).send('OK');
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+);
+
 export default router;
