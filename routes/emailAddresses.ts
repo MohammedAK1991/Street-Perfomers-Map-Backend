@@ -54,14 +54,9 @@ router.post(
         return;
       }
 
-      await firestore
-        .collection('users')
-        .doc(uid)
-        .collection('emails')
-        .doc(emailAddress)
-        .set({
-          email: emailAddress,
-        });
+      await firestore.collection('users').doc(uid).collection('emails').add({
+        email: emailAddress,
+      });
 
       res.status(200).send('email address added to user document');
     } catch (err) {
@@ -78,7 +73,7 @@ router.delete(
     try {
       const { uid } = req.params;
 
-      const { emailAddress } = req.body;
+      const { id } = req.body;
 
       const doc = await firestore.collection('users').doc(uid).get();
 
@@ -91,7 +86,7 @@ router.delete(
         .collection('users')
         .doc(req.params.uid)
         .collection('emails')
-        .doc(emailAddress)
+        .doc(id)
         .delete();
 
       res.status(200).send('OK');
@@ -108,7 +103,7 @@ router.patch(
     try {
       const { uid } = req.params;
 
-      const { emailAddress } = req.body;
+      const { id, updatedEmailAddress } = req.body;
 
       const doc = await firestore.collection('users').doc(uid).get();
 
@@ -121,14 +116,15 @@ router.patch(
         .collection('users')
         .doc(uid)
         .collection('emails')
-        .doc()
+        .doc(id)
         .update({
-          email: emailAddress,
+          email: updatedEmailAddress,
         });
 
       res.status(200).send('OK');
     } catch (err) {
       res.status(500).send(err);
+      console.log({ err });
     }
   },
 );
