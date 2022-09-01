@@ -25,6 +25,7 @@ router.get(
         .doc(req.params.uid)
         .collection('emails')
         .get();
+
       const emails = [];
       for await (const email of emailsSubCollectionSnapshot.docs) {
         const emailData = email.data();
