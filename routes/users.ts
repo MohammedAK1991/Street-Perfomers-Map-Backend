@@ -1,7 +1,8 @@
 import express from 'express';
 import { authenticateFirebaseToken } from '../auth/auth';
 const router = express.Router();
-import firestore from '../data/firebase';
+import UserFirestore from '../utils/firestore'
+
 
 router.post(
   '/users',
@@ -10,17 +11,14 @@ router.post(
     try {
       const { uid, email, name } = req.body;
 
-      const doc = await firestore.collection('users').doc(uid).get();
+      const doc = await UserFirestore.getDocument(uid);
 
       if (doc.exists) {
         res.status(409).send(new Error('User document already exists.'));
         return;
       }
 
-      await firestore.collection('users').doc(uid).set({
-        email,
-        name,
-      });
+      await UserFirestore.addDocument(uid,{email, name})
 
       res.status(200).send('OK');
     } catch (err) {
