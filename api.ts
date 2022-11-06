@@ -7,7 +7,7 @@ import users from './routes/users';
 import emailBody from './routes/emailBody';
 
 router.get('/', (req, res) => {
-  res.status(200).send('Welcome to the callypso backend');
+  res.status(200).send('Welcome to the Street perfomers Backend ');
 });
 
 // Build routes
