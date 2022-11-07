@@ -11,6 +11,7 @@ export function authenticateFirebaseToken(
   const token = authHeader && authHeader.split(' ')[1];
 
   if (token == null) {
+    console.log('no token');
     res.sendStatus(401);
     return;
   }
@@ -18,7 +19,11 @@ export function authenticateFirebaseToken(
   app
     .auth()
     .verifyIdToken(token)
-    .then(() => {
+    .then((decodedToken) => {
+      const { uid, email } = decodedToken;
+      console.log(uid, 'uid');
+      console.log(email, 'email');
+
       next();
     })
     .catch((error) => {

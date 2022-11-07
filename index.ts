@@ -19,4 +19,6 @@ app.use(cors());
 
 app.use('/', api);
 
-app.listen(port, () => console.info(`Qoala API listening on port ${port}!`));
+app.listen(port, () =>
+  console.info(`STreet Peromers  API listening on port ${port}!`),
+);

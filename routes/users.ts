@@ -18,7 +18,7 @@ router.post(
         return;
       }
 
-      await UserFirestore.addDocument(uid,{email, name})
+      await UserFirestore.addDocument(uid, { email, name });
 
       res.status(200).send('OK');
     } catch (err) {
