@@ -20,5 +20,5 @@ app.use(cors());
 app.use('/', api);
 
 app.listen(port, () =>
-  console.info(`STreet Peromers  API listening on port ${port}!`),
+  console.info(`Street Performers  API listening on port ${port}!`),
 );
