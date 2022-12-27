@@ -4,6 +4,7 @@ const router = express.Router();
 
 import emailAddresses from './routes/emailAddresses';
 import users from './routes/users';
+import allPerformances from './routes/performancess';
 import emailBody from './routes/emailBody';
 import performances from './routes/performances';
 
@@ -15,6 +16,7 @@ router.get('/', (req, res) => {
 router.use('/', emailAddresses);
 router.use('/', users);
 router.use('/', performances);
+router.use('/', allPerformances);
 router.use('/', emailBody);
 
 export default router;
