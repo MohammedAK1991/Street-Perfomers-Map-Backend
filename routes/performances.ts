@@ -50,9 +50,13 @@ router.post(
   authenticateFirebaseToken,
   async (req: express.Request, res: express.Response) => {
     try {
-      console.log('yo');
       const { uid } = req.params;
-      const { performanceTitle, performanceTime } = req.body;
+      const {
+        performanceTitle,
+        performanceTime,
+        performanceLatitude,
+        performanceLongitude,
+      } = req.body;
 
       const doc = await firestore.collection('users').doc(uid).get();
 
@@ -61,6 +65,16 @@ router.post(
         return;
       }
 
+      const blaDocs = await firestore
+        .collection('performances')
+        .where('performance', '==', performanceTitle)
+        .get();
+
+      if (blaDocs.docs.length > 0) {
+        console.log('Performance Namajjj already exist');
+        res.status(409).send(new Error('Performance Name already exist'));
+        return;
+      }
       await firestore
         .collection('users')
         .doc(uid)
@@ -68,7 +82,21 @@ router.post(
         .add({
           performance: performanceTitle,
           performanceTime: performanceTime,
+          coordinates: {
+            latitude: performanceLatitude,
+            longitude: performanceLongitude,
+          } as any,
         });
+
+      await firestore.collection('performances').add({
+        creatorID: uid,
+        performance: performanceTitle,
+        performanceTime: performanceTime,
+        coordinates: {
+          latitude: performanceLatitude,
+          longitude: performanceLongitude,
+        } as any,
+      });
 
       res.status(200).send('Performance added to user document');
     } catch (err) {
@@ -85,7 +113,7 @@ router.delete(
     try {
       const { uid } = req.params;
 
-      const { id } = req.body;
+      const { id, performance } = req.body;
 
       const doc = await firestore.collection('users').doc(uid).get();
 
@@ -100,6 +128,25 @@ router.delete(
         .collection('performances')
         .doc(id)
         .delete();
+
+      await firestore
+        .collection('performances')
+        .where('creatorID', '==', uid)
+        .where('performance', '==', performance)
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            doc.ref.delete();
+          });
+          // querySnapshot.docs.delete();
+          //.collection('performances')
+          //.doc(id)
+
+          // console.log(
+          //   querySnapshot.docs.map((docSnapshot) => docSnapshot.id),
+          //   'is the query snapshot where the id matches',
+          // );
+        });
 
       res.status(200).send('OK');
     } catch (err) {
@@ -132,6 +179,19 @@ router.patch(
           performance: editPerformanceTitle,
           performanceTime: editPerformanceTime,
         });
+
+      await firestore
+        .collection('performances')
+        .where('creatorID', '==', uid)
+        .where('performance', '==', performance)
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            console.log(doc.data(), 'is the doc data');
+            // doc.ref.delete();
+          });
+        });
+
       res.status(200).send('OK');
     } catch (err) {
       res.status(500).send(err);
